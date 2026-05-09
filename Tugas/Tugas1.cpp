@@ -1,10 +1,12 @@
 #include <conio.h>
 #include <iostream>
 #include <stdlib.h>
+#include <sstream>
+#include <string>
 
 using namespace std;
 
-typedef struct TNode {
+struct TNode {
     string data;
     TNode *next;
 };
@@ -105,22 +107,34 @@ int isEmpty() {
 }
 
 void tambahDepan() {
-    cout<<"Masukkan data : ";
-    TNode *baru;
-    baru = new TNode;
-    cin>>dataBaru;
-    baru->data = dataBaru;
-    baru->next = baru;
+    cout << "Masukkan data : ";
 
-    if(isEmpty() == 1) {
-        head = baru;
-        tail = baru;
-    } else {
-        baru->next = head;
-        head = baru;
-        tail->next = head;
+    string input;
+    getline(cin >> ws, input);
+
+    stringstream ss(input);
+
+    TNode *baru;
+
+    while (ss >> dataBaru) {
+
+        baru = new TNode;
+
+        baru->data = dataBaru;
+        baru->next = baru;
+
+        if(isEmpty() == 1) {
+            head = baru;
+            tail = baru;
+        } else {
+            tail->next = baru;
+            tail = baru;
+            tail->next = head;
+        }
+
+        cout << "Data \"" << dataBaru
+             << "\" berhasil dimasukkan." << endl;
     }
-    cout << "Data \""<<dataBaru<<"\" berhasil dimasukkan di bagian depan."<<endl;
 }
 
 void tambahBelakang() {
@@ -144,39 +158,128 @@ void tambahBelakang() {
 
 void hapusDepan() {
     if(isEmpty() == 0) {
-        TNode *hapus;
-        hapus = head;
-        dataHapus = hapus->data;
+        int N;
+        cout << "Hapus node posisi ke-N dari depan : ";
+        cin >> N;
 
-        if(head != tail) {
-            head = head->next;
-            tail->next = head;
-        } else {
-            init();
+        TNode *hapus;
+        int jumlah = 1;
+        TNode *bantu = head;
+
+        while(bantu->next != head) {
+            jumlah++;
+            bantu = bantu->next;
         }
 
-        delete hapus;
+        if(N > jumlah) {
+            hapus = tail;
+            dataHapus = hapus->data;
+
+            if(head != tail) {
+                TNode *newTail;
+                newTail = head;
+
+                while(newTail->next != tail) {
+                    newTail = newTail->next;
+                }
+                tail = newTail;
+                tail->next = head;
+            } else {
+                init();
+            }
+            delete hapus;
+        } else {
+            if(N == 1) {
+                hapus = head;
+                dataHapus = hapus->data;
+
+                if(head != tail) {
+                    head = head->next;
+                    tail->next = head;
+                } else {
+                    init();
+                }
+                delete hapus;
+            } else {
+                TNode *bantu;
+                bantu = head;
+
+                for(int i = 1; i < N - 1; i++) {
+                    bantu = bantu->next;
+                }
+                hapus = bantu->next;
+                dataHapus = hapus->data;
+                bantu->next = hapus->next;
+
+                if(hapus == tail) {
+                    tail = bantu;
+                }
+                tail->next = head;
+                delete hapus;
+            }
+        }
+
     } else cout<<"Tidak terdapat data pada Linked List."<<endl;
 }
 
 void hapusBelakang() {
     if(isEmpty() == 0) {
-        TNode *hapus, *newTail;
-        hapus = tail;
-        dataHapus = hapus->data;
+        int N;
+        cout << "Hapus node ke-N dari belakang : ";
+        cin >> N;
 
-        if(head != tail) {
-            newTail = head;
-            while(newTail->next != tail) {
-                newTail = newTail->next;
-            }
-            tail = newTail;
-            tail->next = head;
-        } else {
-            init();
+        TNode *hapus, *newTail;
+        int jumlah = 1;
+        TNode *bantu = head;
+
+        while(bantu->next != head) {
+            jumlah++;
+            bantu = bantu->next;
         }
 
-        delete hapus;
+        if(N > jumlah) {
+            hapus = head;
+            dataHapus = hapus->data;
+
+            if(head != tail) {
+                head = head->next;
+                tail->next = head;
+            } else {
+                init();
+            }
+            delete hapus;
+        } else {
+            int posisi = jumlah - N;
+
+            if(posisi == 0) {
+                hapus = head;
+                dataHapus = hapus->data;
+                if(head != tail) {
+                    head = head->next;
+                    tail->next = head;
+                } else {
+                    init();
+                }
+                delete hapus;
+            } else {
+                newTail = head;
+
+                for(int i = 1; i < posisi; i++) {
+                    newTail = newTail->next;
+                }
+                hapus = newTail->next;
+                dataHapus = hapus->data;
+
+                newTail->next = hapus->next;
+
+                if(hapus == tail) {
+                    tail = newTail;
+                }
+                tail->next = head;
+                delete hapus;
+            }
+        }
+
     } else cout<<"Tidak terdapat data pada Linked List."<<endl;
 }
 
